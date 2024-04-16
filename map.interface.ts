@@ -3,16 +3,8 @@ import { Household } from "./household"
 
 export interface MapType {
     city: {
-        Burnaby: {
+        [key: string] : {
             households: Household[],
-            clinics: Clinic[]
-        },
-        Vancouver: {
-            households: Household[],
-            clinics: Clinic[]
-        },
-        Richmond: {
-            households: Household[]
             clinics: Clinic[]
         }
     }

@@ -11,7 +11,10 @@ export class SimpleReport implements IReport {
     async printDetails(): Promise<void> {
         for (const [key, value] of Object.entries(this._map.mapData.city)) {
             value.clinics.forEach((clinic) => {
-                console.log(`${clinic.name} - ${clinic.queue?.size}`)
+                if (clinic.queue){
+                    
+                }
+                console.log(`${clinic.name} - ${clinic.queue?.size() || 0}`)
             })
         }
         return;

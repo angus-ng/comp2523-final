@@ -2,6 +2,7 @@ import { readFile } from "fs/promises";
 import { EOL } from "os";
 import { basename, extname } from "path";
 import { MapType } from "./map.interface";
+import { Queue } from "./queue";
 
 let currentIntake = 20;
 
@@ -62,11 +63,22 @@ export class Map {
         for (const [key, value] of Object.entries(this._mapData.city)) {
             value.households.forEach((household) => {
                 household.inhabitants.forEach((person) => {
-                    //find nearest clinic based on index
-                    //enqueue them by calling the method from the Queue
+                    value.clinics.forEach((clinic) => {
+                        if (!clinic.queue){
+                            clinic.queue = new Queue(20) //ideally you would be able to adjust this age for each individual clinic
+                        }
+                        if (!person.isVaccinated) {
+                            let hh_block = household.blockNum
+                            for (hh_block; hh_block < (value.households.length + value.clinics.length); hh_block++) {
+                                if (hh_block === clinic.blockNum) {
+                                    person.isVaccinated = true;
+                                    return clinic.queue.enqueue(person)
+                                }
+                            }
+                        }
+                    })
                 })
             })
-            // console.log(value.clinics)
         }
     }
 }   

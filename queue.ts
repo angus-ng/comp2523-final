@@ -22,7 +22,7 @@ export class Queue {
     }
 
     enqueue(person:Person) {
-        if (person.age > this._currentIntake){
+        if (person.age >= this._currentIntake){
             this._queue.push(person)
         }
     }
