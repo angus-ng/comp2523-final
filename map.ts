@@ -62,20 +62,30 @@ export class Map {
     registerForShots() {
         for (const [key, value] of Object.entries(this._mapData.city)) {
             value.households.forEach((household) => {
-                household.inhabitants.forEach((person) => {
-                    value.clinics.forEach((clinic) => {
-                        if (!clinic.queue){
-                            clinic.queue = new Queue(20) //ideally you would be able to adjust this age for each individual clinic
-                        }
-                        if (!person.isVaccinated) {
-                            let hh_block = household.blockNum
-                            for (hh_block; hh_block < (value.households.length + value.clinics.length); hh_block++) {
-                                if (hh_block === clinic.blockNum) {
+                const unvaccinated = household.inhabitants.filter((person) => {
+                    if (person.isVaccinated === false) {
+                        return person;
+                    }
+                })
+                value.clinics.forEach((clinic) => {
+                    if (!clinic.queue){
+                        clinic.queue = new Queue(20) //ideally you would be able to adjust this age for each individual clinic
+                    }
+                    const clinicBlockNums = value.clinics.map((clinic) => {
+                        return clinic.blockNum;
+                    })
+                    unvaccinated.forEach((person) => {
+                        let closest = clinicBlockNums.reduce(function (prev, curr){
+                            return (Math.abs(curr - household.blockNum) <= Math.abs(prev - household.blockNum) ? curr: prev)
+                        })
+                        value.clinics.forEach((clinic) => {
+                            if (clinic.blockNum === closest) {
+                                if (clinic.queue){
+                                    clinic.queue.enqueue(person)
                                     person.isVaccinated = true;
-                                    return clinic.queue.enqueue(person)
                                 }
                             }
-                        }
+                        })
                     })
                 })
             })
